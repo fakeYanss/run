@@ -2,7 +2,7 @@ module.exports = {
   pathPrefix: `/run`, // Change to `/running_page` when running on github pages
   siteMetadata: {
     siteTitle: 'Running Page',
-    siteUrl: 'https://foreti.me/run',
+    siteUrl: 'https://run.foreti.me/',
     logo: 'https://avatars.githubusercontent.com/u/30440198?v=4',
     description: 'Personal site and blog',
     navLinks: [
