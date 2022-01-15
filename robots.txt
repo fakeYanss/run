@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://foreti.me/run/sitemap/sitemap-index.xml
-Host: https://foreti.me
+Sitemap: https://run.foreti.me/run/sitemap/sitemap-index.xml
+Host: https://run.foreti.me
