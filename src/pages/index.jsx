@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
+import React, {useEffect, useState} from 'react';
 import Layout from 'src/components/Layout';
 import LocationStat from 'src/components/LocationStat';
 import RunMap from 'src/components/RunMap';
@@ -20,7 +21,7 @@ import {
   titleForShow,
 } from 'src/utils/utils';
 
-export default () => {
+const Index = () => {
   const { siteTitle } = useSiteMetadata();
   const { activities, thisYear } = useActivities();
   const [year, setYear] = useState(thisYear);
@@ -35,40 +36,41 @@ export default () => {
   const [intervalId, setIntervalId] = useState();
 
   const [viewport, setViewport] = useState({
-    width: '100%',
-    height: 400,
     ...bounds,
   });
 
-  const changeByItem = (item, name, func) => {
+  const changeByItem = (item, name, func, isChanged) => {
     scrollToMap();
     setActivity(filterAndSortRuns(activities, item, func, sortDateFunc));
-    setTitle(`${item} ${name} Running Heatmap`);
-    setRunIndex(-1);
+    // if the year not change, we do not need to setYear
+    if (!isChanged) {
+      setRunIndex(-1);
+      setTitle(`${item} ${name} Running Heatmap`);
+    }
   };
 
   const changeYear = (y) => {
+
+    const isChanged = y === year;
     // default year
     setYear(y);
 
     if (viewport.zoom > 3) {
       setViewport({
-        width: '100%',
-        height: 400,
         ...bounds,
       });
     }
 
-    changeByItem(y, 'Year', filterYearRuns);
+    changeByItem(y, 'Year', filterYearRuns, isChanged);
     clearInterval(intervalId);
   };
 
   const changeCity = (city) => {
-    changeByItem(city, 'City', filterCityRuns);
+    changeByItem(city, 'City', filterCityRuns, false);
   };
 
   const changeTitle = (title) => {
-    changeByItem(title, 'Title', filterTitleRuns);
+    changeByItem(title, 'Title', filterTitleRuns, false);
   };
 
   const locateActivity = (run) => {
@@ -80,8 +82,6 @@ export default () => {
 
   useEffect(() => {
     setViewport({
-      width: '100%',
-      height: 500,
       ...bounds,
     });
   }, [geoData]);
@@ -101,7 +101,7 @@ export default () => {
       i += sliceNume;
     }, 100);
     setIntervalId(id);
-  }, [year]);
+  }, [runs]);
 
   // TODO refactor
   useEffect(() => {
@@ -167,11 +167,10 @@ export default () => {
   return (
     <Layout>
       <div className="mb5">
-        <div className="w-100">
+        <div className="fl w-30-l">
           <h1 className="f1 fw9 i">
             <a href="/">{siteTitle}</a>
           </h1>
-        </div>
         {viewport.zoom <= 3 && IS_CHINESE ? (
           <LocationStat
             changeYear={changeYear}
@@ -181,6 +180,7 @@ export default () => {
         ) : (
           <YearsStat year={year} onClick={changeYear} />
         )}
+        </div>
         <div className="fl w-100 w-70-l">
           <RunMap
             runs={runs}
@@ -206,6 +206,10 @@ export default () => {
           )}
         </div>
       </div>
+      {/* Enable Audiences in Vercel Analytics: https://vercel.com/docs/concepts/analytics/audiences/quickstart */}
+      <Analytics />
     </Layout>
   );
 };
+
+export default Index;
